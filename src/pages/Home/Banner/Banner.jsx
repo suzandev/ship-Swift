@@ -47,13 +47,13 @@ const Banner = () => {
             />
 
             {/* Animated Overlay */}
-            <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-center px-4 md:px-8">
+            <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-center px-4 md:px-8 rounded-lg">
               <motion.h2
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.3 }}
                 className="text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-lg">
-                {slide.title}
+                {/* {slide.title} */}
               </motion.h2>
 
               <motion.p
