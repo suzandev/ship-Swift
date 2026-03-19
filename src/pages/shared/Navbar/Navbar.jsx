@@ -63,7 +63,7 @@ const Navbar = () => {
                 )}
               </button>
 
-              <button className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300">
+              <button className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800 transition-all duration-300">
                 Sign In
               </button>
 
