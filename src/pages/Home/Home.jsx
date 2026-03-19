@@ -4,6 +4,7 @@ import HowItWorks from "./HowItWorks/HowItWorks";
 import Services from "./Services/Services";
 import TrustedBy from "./TrustedBy/TrustedBy";
 import OurServices from "./OurServices/OurServices";
+import CustomersSayings from "./Testimonials/CustomersSayings";
 
 const Home = () => {
   return (
@@ -13,6 +14,7 @@ const Home = () => {
       <Services />
       <TrustedBy />
       <OurServices />
+      <CustomersSayings />
     </div>
   );
 };
