@@ -1,6 +1,6 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay } from "swiper/modules"; // ✅ Add Autoplay
+import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 
@@ -138,7 +138,7 @@ const CustomersSayings = () => {
         {/* Swiper Carousel */}
         <div className="relative ">
           <Swiper
-            modules={[Navigation, Autoplay]} // ✅ Add Autoplay
+            modules={[Navigation, Autoplay]}
             navigation={{
               nextEl: ".swiper-button-next",
               prevEl: ".swiper-button-prev",
