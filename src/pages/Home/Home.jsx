@@ -6,6 +6,7 @@ import TrustedBy from "./TrustedBy/TrustedBy";
 import OurServices from "./OurServices/OurServices";
 import CustomersSayings from "./Testimonials/CustomersSayings";
 import FaqSection from "./Faq/FaqSection";
+import BeARider from "../BeARider/BeARider";
 
 const Home = () => {
   return (
@@ -17,6 +18,7 @@ const Home = () => {
       <OurServices />
       <CustomersSayings />
       <FaqSection />
+      <BeARider />
     </div>
   );
 };

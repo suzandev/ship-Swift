@@ -82,7 +82,7 @@ const OurServices = () => {
         </div>
 
         {/* Banner Section */}
-        <div className="mt-16 flex flex-col md:flex-row rounded-2xl overflow-hidden bg-indigo-600">
+        <div className="bg-[url('assets/be-a-merchant-bg.png')] bg-no-repeat mt-16 flex flex-col md:flex-row rounded-2xl overflow-hidden bg-[#03373D]">
           {/* Left Content */}
           <div className="md:w-1/2 p-10 text-white flex flex-col justify-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
