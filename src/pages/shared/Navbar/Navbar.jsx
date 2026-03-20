@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
 import { RiArrowRightUpLongLine } from "react-icons/ri";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
@@ -64,11 +64,11 @@ const Navbar = () => {
               </button>
 
               <button className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800 transition-all duration-300">
-                Sign In
+                <Link to={"/login"}>Sign In </Link>
               </button>
 
               <button className="px-4 py-2 text-sm bg-[#CAEB66] text-black font-semibold rounded-lg hover:scale-105 transition-transform duration-300">
-                Sign Up
+                <Link to={"/register"}>Sign Up </Link>
               </button>
 
               <button className="p-3 bg-black text-[#CAEB66] rounded-full hover:rotate-45 transition-transform duration-300">

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
+import useAuth from "../../../hooks/useAuth";
 
 const Register = () => {
+  const { createUser } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -20,6 +22,13 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Register Data:", formData);
+    createUser(formData.email, formData.password)
+      .then((result) => {
+        console.log(result.user);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
