@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 
 const Register = () => {
-  const { createUser } = useAuth();
+  const { createUser, googleSignIn } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,6 +28,17 @@ const Register = () => {
       })
       .catch((error) => {
         console.log(error);
+      });
+  };
+
+  // signIn with Google
+  const handleGoogleLogin = () => {
+    googleSignIn()
+      .then((result) => {
+        console.log(result.user);
+      })
+      .catch((error) => {
+        console.error(error);
       });
   };
 
@@ -89,7 +100,7 @@ const Register = () => {
         {/* Register Button */}
         <button
           type="submit"
-          className="w-full bg-[#CAEB66] hover:bg-[#9db555]t-white py-2 rounded-lg transition">
+          className="w-full bg-[#CAEB66] hover:bg-[#9db555]  py-2 rounded-lg transition">
           Register
         </button>
 
@@ -110,6 +121,7 @@ const Register = () => {
 
         {/* Google Register */}
         <button
+          onClick={handleGoogleLogin}
           type="button"
           className="w-full flex items-center justify-center gap-2 border py-2 rounded-lg hover:bg-gray-100 transition">
           <FcGoogle size={20} />
