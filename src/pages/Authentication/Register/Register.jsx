@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const Register = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const { createUser, googleSignIn } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
@@ -84,17 +86,22 @@ const Register = () => {
         </div>
 
         {/* Password */}
-        <div>
+        <div className="relative">
           <label className="text-sm text-gray-600">Password</label>
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             value={formData.password}
             onChange={handleChange}
             placeholder="Password"
-            className="w-full mt-1 px-4 py-2 border rounded-lg bg-gray-50 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full mt-1 px-4 py-2 pr-10 border rounded-lg bg-gray-50 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
             required
           />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-[38px] cursor-pointer text-gray-500">
+            {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+          </span>
         </div>
 
         {/* Register Button */}
