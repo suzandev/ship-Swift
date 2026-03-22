@@ -19,6 +19,11 @@ export const router = createBrowserRouter([
       {
         path: "coverage",
         Component: Coverage,
+        loader: async () => {
+          const res = await fetch("../data/warehouses.json");
+          if (!res.ok) throw new Error("Failed to load warehouses");
+          return res.json();
+        },
       },
     ],
   },

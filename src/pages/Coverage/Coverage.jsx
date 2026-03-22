@@ -4,13 +4,12 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 import L from "leaflet";
+
+// Fix Leaflet marker icons
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-import warehouses from "../../data/warehouses.json";
-
-// Fix marker
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
@@ -18,43 +17,44 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-// Fly animation
+// Fly animation component
 const FlyToLocation = ({ position }) => {
   const map = useMap();
-
   useEffect(() => {
     if (position) {
-      map.flyTo(position, 10, {
-        duration: 1.5,
-      });
+      map.flyTo(position, 10, { duration: 1.5 });
     }
   }, [position, map]);
-
   return null;
 };
 
 const Coverage = () => {
+  const [warehouses, setWarehouses] = useState([]);
   const [search, setSearch] = useState("");
   const [position, setPosition] = useState([23.685, 90.3563]);
-  const [marker, setMarker] = useState(null);
-  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedWarehouse, setSelectedWarehouse] = useState(null);
+
+  // Fetch JSON from public folder
+  useEffect(() => {
+    fetch("/data/warehouses.json")
+      .then((res) => res.json())
+      .then((data) => setWarehouses(data))
+      .catch((err) => console.error("Failed to load warehouses:", err));
+  }, []);
 
   const handleSearch = () => {
     const key = search.toLowerCase().trim();
 
     const found = warehouses.find(
-      (item) =>
-        item.district.toLowerCase() === key || item.city.toLowerCase() === key,
+      (w) => w.district.toLowerCase() === key || w.city.toLowerCase() === key,
     );
 
     if (found) {
-      const coords = [found.latitude, found.longitude];
-
-      setPosition(coords);
-      setMarker(coords);
-      setSelectedDistrict(found.district);
+      setSelectedWarehouse(found);
+      setPosition([found.latitude, found.longitude]);
     } else {
       alert("District not found 😢");
+      setSelectedWarehouse(null);
     }
   };
 
@@ -62,7 +62,7 @@ const Coverage = () => {
     <section className="bg-gray-100 py-12 px-4 md:px-8 lg:px-16 rounded-2xl mx-4 md:mx-8 lg:mx-16 my-10">
       {/* Title */}
       <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-6">
-        We are available in 64 districts
+        We are available in {warehouses.length} districts
       </h2>
 
       {/* Search */}
@@ -78,7 +78,6 @@ const Coverage = () => {
             className="bg-transparent outline-none w-full text-sm"
           />
         </div>
-
         <button
           onClick={handleSearch}
           className="bg-lime-400 hover:bg-lime-500 text-black font-medium px-6 py-2 rounded-full transition">
@@ -97,7 +96,7 @@ const Coverage = () => {
         <MapContainer
           center={position}
           zoom={7}
-          scrollWheelZoom={true}
+          scrollWheelZoom
           className="w-full h-full">
           <TileLayer
             attribution="&copy; OpenStreetMap contributors"
@@ -106,11 +105,39 @@ const Coverage = () => {
 
           <FlyToLocation position={position} />
 
-          {marker && (
-            <Marker position={marker}>
+          {warehouses
+            .filter((w) => selectedWarehouse?.district !== w.district)
+            .map((w) => (
+              <Marker key={w.district} position={[w.latitude, w.longitude]}>
+                <Popup>
+                  <strong>{w.district}</strong> <br />
+                  Delivery Available ✅ <br />
+                  <span className="font-semibold">Covered Areas:</span>
+                  <ul className="list-disc list-inside">
+                    {w.covered_area.map((area, i) => (
+                      <li key={i}>{area}</li>
+                    ))}
+                  </ul>
+                </Popup>
+              </Marker>
+            ))}
+
+          {/* Render selected warehouse with covered_area */}
+          {selectedWarehouse && (
+            <Marker
+              position={[
+                selectedWarehouse.latitude,
+                selectedWarehouse.longitude,
+              ]}>
               <Popup>
-                <strong>{selectedDistrict}</strong> <br />
-                Delivery Available ✅
+                <strong>{selectedWarehouse.district}</strong> <br />
+                Delivery Available ✅ <br />
+                <span className="font-semibold">Covered Areas:</span>
+                <ul className="list-disc list-inside">
+                  {selectedWarehouse.covered_area.map((area, i) => (
+                    <li key={i}>{area}</li>
+                  ))}
+                </ul>
               </Popup>
             </Marker>
           )}
