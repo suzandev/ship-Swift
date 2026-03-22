@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router";
 import Navbar from "../pages/shared/Navbar/Navbar";
 import Footer from "../pages/shared/Footer/Footer";
+import ScrollToTopButton from "../pages/shared/ScrollToTopButton/ScrollToTopButton";
 
 const RootLayout = () => {
   return (
@@ -10,6 +11,7 @@ const RootLayout = () => {
         <Navbar />
         <Outlet />
         <Footer />
+        <ScrollToTopButton />
       </div>
     </div>
   );

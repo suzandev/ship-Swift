@@ -47,9 +47,11 @@ const Register = () => {
   return (
     <div className="w-full max-w-md mx-auto">
       {/* Logo */}
-      <h2 className="text-2xl font-bold text-[#1E1E1E] dark:text-white mb-16">
-        🚚 Ship <span className="text-[#CAEB66]">Swift</span>
-      </h2>
+      <Link to="/">
+        <h2 className="text-2xl font-bold text-[#1E1E1E] dark:text-white mb-16">
+          🚚 Ship <span className="text-[#CAEB66]">Swift</span>
+        </h2>
+      </Link>
 
       {/* Title */}
       <h1 className="text-3xl font-bold text-gray-900">Create an Account</h1>

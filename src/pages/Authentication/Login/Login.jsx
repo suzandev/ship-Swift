@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
-import { FiEye, FiEyeOff } from "react-icons/fi"; // 👈 added
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import useAuth from "../../../hooks/useAuth";
 
 const Login = () => {
+  const { googleSignIn } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,13 +25,24 @@ const Login = () => {
     e.preventDefault();
     console.log("Login Data:", formData);
   };
+  const handleGoogleLogin = () => {
+    googleSignIn()
+      .then((result) => {
+        console.log(result.user);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   return (
     <div className="w-full max-w-md mx-auto">
       {/* Logo */}
-      <h2 className="text-2xl font-bold text-[#1E1E1E] dark:text-white mb-16">
-        🚚 Ship <span className="text-[#CAEB66]">Swift</span>
-      </h2>
+      <Link to="/">
+        <h2 className="text-2xl font-bold text-[#1E1E1E] dark:text-white mb-16">
+          🚚 Ship <span className="text-[#CAEB66]">Swift</span>
+        </h2>
+      </Link>
 
       {/* Title */}
       <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
@@ -107,6 +120,7 @@ const Login = () => {
 
         {/* Google Login */}
         <button
+          onClick={handleGoogleLogin}
           type="button"
           className="w-full flex items-center justify-center gap-2 border py-2 rounded-lg hover:bg-gray-100 transition">
           <FcGoogle size={20} />
