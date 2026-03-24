@@ -1,12 +1,32 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
+import { useLoaderData } from "react-router-dom";
 
 const SendParcel = () => {
+  const warehouses = useLoaderData(); // Loader data
   const [parcelType, setParcelType] = useState("document");
+
+  // Sender cascading
+  const [senderDistrict, setSenderDistrict] = useState("");
+  const [senderCity, setSenderCity] = useState("");
+  const [senderCoveredArea, setSenderCoveredArea] = useState("");
+
+  // Receiver cascading
+  const [receiverDistrict, setReceiverDistrict] = useState("");
+  const [receiverCity, setReceiverCity] = useState("");
+  const [receiverCoveredArea, setReceiverCoveredArea] = useState("");
 
   const inputClass =
     "w-full border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-green-400 outline-none";
+
+  const districts = [...new Set(warehouses.map((w) => w.district))];
+
+  const getCities = (district) =>
+    warehouses.filter((w) => w.district === district).map((w) => w.city);
+
+  const getCoveredAreas = (city) =>
+    warehouses.find((w) => w.city === city)?.covered_area || [];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,40 +41,39 @@ const SendParcel = () => {
       senderName: form.senderName.value,
       senderAddress: form.senderAddress.value,
       senderPhone: form.senderPhone.value,
-      senderDistrict: form.senderDistrict.value,
+      senderDistrict,
+      senderCity,
+      senderCoveredArea,
       pickupInstruction: form.pickupInstruction.value,
 
       // Receiver
       receiverName: form.receiverName.value,
       receiverAddress: form.receiverAddress.value,
       receiverPhone: form.receiverPhone.value,
-      receiverDistrict: form.receiverDistrict.value,
+      receiverDistrict,
+      receiverCity,
+      receiverCoveredArea,
       deliveryInstruction: form.deliveryInstruction.value,
 
       creation_date: new Date(),
     };
 
-    // 💰 Cost Calculation
     let cost = 50;
+    if (parcelType === "non-document") cost += data.weight * 10;
+    if (data.senderDistrict !== data.receiverDistrict) cost += 30;
 
-    if (parcelType === "non-document") {
-      cost += data.weight * 10;
-    }
-
-    // district based charge
-    if (data.senderDistrict !== data.receiverDistrict) {
-      cost += 30;
-    }
-
-    // ✅ Show Toast
     toast.success(`Delivery Cost: ৳${cost}`);
 
-    // ✅ Confirm
     if (confirm(`Confirm booking with cost ৳${cost}?`)) {
       console.log("SEND TO DB 👉", data);
-
       toast.success("Parcel booked successfully ✅");
       form.reset();
+      setSenderDistrict("");
+      setSenderCity("");
+      setSenderCoveredArea("");
+      setReceiverDistrict("");
+      setReceiverCity("");
+      setReceiverCoveredArea("");
     }
   };
 
@@ -64,7 +83,6 @@ const SendParcel = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-sm dark:shadow-gray-700 p-5 md:p-8">
-        {/* Header */}
         <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-100">
           Add Parcel
         </h1>
@@ -73,7 +91,7 @@ const SendParcel = () => {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* ========= Parcel Info ========= */}
+          {/* Parcel Info */}
           <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
             <h2 className="font-medium text-gray-700 dark:text-gray-200 mb-4">
               Parcel Info
@@ -100,32 +118,41 @@ const SendParcel = () => {
             </div>
 
             <div className="grid md:grid-cols-3 gap-4">
-              <input
-                name="title"
-                required
-                placeholder="Parcel Title"
-                className={inputClass}
-              />
-
-              {parcelType === "non-document" && (
+              <div>
+                <label className="text-sm text-gray-600 dark:text-gray-300">
+                  Parcel Title
+                </label>
                 <input
-                  name="weight"
-                  type="number"
-                  placeholder="Weight (KG)"
+                  name="title"
+                  required
+                  placeholder="Parcel Title"
                   className={inputClass}
                 />
+              </div>
+
+              {parcelType === "non-document" && (
+                <div>
+                  <label className="text-sm text-gray-600 dark:text-gray-300">
+                    Weight (KG)
+                  </label>
+                  <input
+                    name="weight"
+                    type="number"
+                    placeholder="Weight (KG)"
+                    className={inputClass}
+                  />
+                </div>
               )}
             </div>
           </div>
 
-          {/* ========= Sender & Receiver ========= */}
+          {/* Sender & Receiver */}
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Sender Details */}
+            {/* Sender */}
             <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
               <h2 className="font-medium text-gray-700 dark:text-gray-200 mb-4">
                 Sender Details
               </h2>
-
               <div className="space-y-4">
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
@@ -138,7 +165,6 @@ const SendParcel = () => {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
                     Address
@@ -150,7 +176,6 @@ const SendParcel = () => {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
                     Sender Phone No
@@ -162,18 +187,73 @@ const SendParcel = () => {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
-                    Your District
+                    District
                   </label>
-                  <select name="senderDistrict" required className={inputClass}>
-                    <option value="">Select your District</option>
-                    <option>Dhaka</option>
-                    <option>Chittagong</option>
-                    <option>Rangpur</option>
+                  <select
+                    name="senderDistrict"
+                    value={senderDistrict}
+                    required
+                    className={inputClass}
+                    onChange={(e) => {
+                      setSenderDistrict(e.target.value);
+                      setSenderCity("");
+                      setSenderCoveredArea("");
+                    }}>
+                    <option value="">Select District</option>
+                    {districts.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
                   </select>
                 </div>
+
+                {senderDistrict && (
+                  <div>
+                    <label className="text-sm text-gray-600 dark:text-gray-300">
+                      City
+                    </label>
+                    <select
+                      name="senderCity"
+                      value={senderCity}
+                      required
+                      className={inputClass}
+                      onChange={(e) => {
+                        setSenderCity(e.target.value);
+                        setSenderCoveredArea("");
+                      }}>
+                      <option value="">Select City</option>
+                      {getCities(senderDistrict).map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {senderCity && (
+                  <div>
+                    <label className="text-sm text-gray-600 dark:text-gray-300">
+                      Covered Area
+                    </label>
+                    <select
+                      name="senderCoveredArea"
+                      value={senderCoveredArea}
+                      required
+                      className={inputClass}
+                      onChange={(e) => setSenderCoveredArea(e.target.value)}>
+                      <option value="">Select Area</option>
+                      {getCoveredAreas(senderCity).map((a) => (
+                        <option key={a} value={a}>
+                          {a}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
@@ -189,12 +269,11 @@ const SendParcel = () => {
               </div>
             </div>
 
-            {/* Receiver Details */}
+            {/* Receiver */}
             <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
               <h2 className="font-medium text-gray-700 dark:text-gray-200 mb-4">
                 Receiver Details
               </h2>
-
               <div className="space-y-4">
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
@@ -207,22 +286,20 @@ const SendParcel = () => {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
-                    Receiver Address
+                    Address
                   </label>
                   <input
                     name="receiverAddress"
                     required
-                    placeholder="Address"
+                    placeholder="Receiver Address"
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
-                    Receiver Contact No
+                    Receiver Phone No
                   </label>
                   <input
                     name="receiverPhone"
@@ -234,18 +311,71 @@ const SendParcel = () => {
 
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
-                    Receiver District
+                    District
                   </label>
                   <select
                     name="receiverDistrict"
+                    value={receiverDistrict}
                     required
-                    className={inputClass}>
-                    <option value="">Select your District</option>
-                    <option>Dhaka</option>
-                    <option>Rangpur</option>
-                    <option>Khulna</option>
+                    className={inputClass}
+                    onChange={(e) => {
+                      setReceiverDistrict(e.target.value);
+                      setReceiverCity("");
+                      setReceiverCoveredArea("");
+                    }}>
+                    <option value="">Select District</option>
+                    {districts.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
                   </select>
                 </div>
+
+                {receiverDistrict && (
+                  <div>
+                    <label className="text-sm text-gray-600 dark:text-gray-300">
+                      City
+                    </label>
+                    <select
+                      name="receiverCity"
+                      value={receiverCity}
+                      required
+                      className={inputClass}
+                      onChange={(e) => {
+                        setReceiverCity(e.target.value);
+                        setReceiverCoveredArea("");
+                      }}>
+                      <option value="">Select City</option>
+                      {getCities(receiverDistrict).map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {receiverCity && (
+                  <div>
+                    <label className="text-sm text-gray-600 dark:text-gray-300">
+                      Covered Area
+                    </label>
+                    <select
+                      name="receiverCoveredArea"
+                      value={receiverCoveredArea}
+                      required
+                      className={inputClass}
+                      onChange={(e) => setReceiverCoveredArea(e.target.value)}>
+                      <option value="">Select Area</option>
+                      {getCoveredAreas(receiverCity).map((a) => (
+                        <option key={a} value={a}>
+                          {a}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
@@ -262,17 +392,13 @@ const SendParcel = () => {
             </div>
           </div>
 
-          {/* Pickup Time Note */}
           <p className="text-xs text-gray-500 dark:text-gray-400">
             * PickUp Time 4pm-7pm Approx.
           </p>
 
-          {/* Button */}
-          <div className="">
-            <button className="bg-[#CAEB66] hover:bg-[#9db555] text-black px-6 py-2 rounded-md text-sm">
-              Proceed to Confirm
-            </button>
-          </div>
+          <button className="bg-[#CAEB66] hover:bg-[#9db555] text-black px-6 py-2 rounded-md text-sm">
+            Proceed to Confirm
+          </button>
         </form>
       </motion.div>
     </div>
