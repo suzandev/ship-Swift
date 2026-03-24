@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { toast } from "react-hot-toast";
 import { useLoaderData } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const SendParcel = () => {
   const warehouses = useLoaderData(); // Loader data
@@ -25,7 +25,7 @@ const SendParcel = () => {
   const getCoveredAreas = (district) =>
     warehouses.find((w) => w.district === district)?.covered_area || [];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
 
@@ -55,7 +55,6 @@ const SendParcel = () => {
 
     // ✅ Cost Calculation
     let cost = 0;
-
     const withinSameDistrict = data.senderDistrict === data.receiverDistrict;
 
     if (parcelType === "document") {
@@ -71,11 +70,29 @@ const SendParcel = () => {
       }
     }
 
-    toast.success(`Delivery Cost: ৳${cost}`);
+    // SweetAlert2 Confirmation
+    const result = await Swal.fire({
+      title: `Delivery Cost: ৳${cost}`,
+      text: "Do you want to confirm the booking?",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#4CAF50",
+      cancelButtonColor: "#f44336",
+      confirmButtonText: "Yes, confirm!",
+      cancelButtonText: "Cancel",
+    });
 
-    if (confirm(`Confirm booking with cost ৳${cost}?`)) {
+    if (result.isConfirmed) {
       console.log("SEND TO DB 👉", data);
-      toast.success("Parcel booked successfully ✅");
+
+      Swal.fire({
+        title: "Success!",
+        text: "Parcel booked successfully ✅",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
       form.reset();
       setSenderDistrict("");
       setSenderCoveredArea("");
