@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "react-hot-toast";
 import { useLoaderData } from "react-router-dom";
 import Swal from "sweetalert2";
+import useAuth from "../../hooks/useAuth";
 
 const SendParcel = () => {
   const warehouses = useLoaderData(); // Loader data
+  const { user } = useAuth();
   const [parcelType, setParcelType] = useState("document");
 
   // Sender cascading
@@ -25,16 +28,37 @@ const SendParcel = () => {
   const getCoveredAreas = (district) =>
     warehouses.find((w) => w.district === district)?.covered_area || [];
 
+  const calculateCost = (data) => {
+    const withinSameDistrict = data.senderDistrict === data.receiverDistrict;
+    let baseCost = 0;
+    let extraCharge = 0;
+
+    if (data.parcelType === "document") {
+      baseCost = withinSameDistrict ? 60 : 80;
+    } else {
+      if (data.weight <= 3) {
+        baseCost = withinSameDistrict ? 110 : 150;
+      } else {
+        const extraKg = data.weight - 3;
+        baseCost = withinSameDistrict ? 110 : 150;
+        extraCharge = extraKg * 40 + (withinSameDistrict ? 0 : 40);
+      }
+    }
+
+    const totalCost = baseCost + extraCharge;
+    return { baseCost, extraCharge, totalCost, withinSameDistrict };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
 
     const data = {
+      userEmail: user?.email || "guest@example.com",
       parcelType,
       title: form.title.value,
       weight: parcelType === "non-document" ? Number(form.weight.value) : 0,
 
-      // Sender
       senderName: form.senderName.value,
       senderAddress: form.senderAddress.value,
       senderPhone: form.senderPhone.value,
@@ -42,7 +66,6 @@ const SendParcel = () => {
       senderCoveredArea,
       pickupInstruction: form.pickupInstruction.value,
 
-      // Receiver
       receiverName: form.receiverName.value,
       receiverAddress: form.receiverAddress.value,
       receiverPhone: form.receiverPhone.value,
@@ -50,48 +73,39 @@ const SendParcel = () => {
       receiverCoveredArea,
       deliveryInstruction: form.deliveryInstruction.value,
 
-      creation_date: new Date(),
+      creation_date: new Date().toISOString(),
+      parcelStatus: "pending",
+      trackingNumber: `TRK-${Date.now()}`,
+      paymentStatus: "unpaid",
     };
 
-    // ✅ Cost Calculation
-    let cost = 0;
-    const withinSameDistrict = data.senderDistrict === data.receiverDistrict;
+    const { baseCost, extraCharge, totalCost, withinSameDistrict } =
+      calculateCost(data);
 
-    if (parcelType === "document") {
-      cost = withinSameDistrict ? 60 : 80;
-    } else {
-      if (data.weight <= 3) {
-        cost = withinSameDistrict ? 110 : 150;
-      } else {
-        const extraKg = data.weight - 3;
-        cost = withinSameDistrict
-          ? 110 + extraKg * 40
-          : 150 + extraKg * 40 + 40;
-      }
-    }
-
-    // SweetAlert2 Confirmation
-    const result = await Swal.fire({
-      title: `Delivery Cost: ৳${cost}`,
-      text: "Do you want to confirm the booking?",
-      icon: "info",
+    // SweetAlert2 breakdown
+    const { isConfirmed } = await Swal.fire({
+      title: "Delivery Cost Breakdown",
+      html: `
+        <table class="w-full text-left">
+          <tr><td><b>Parcel Type:</b></td><td>${data.parcelType}</td></tr>
+          <tr><td><b>Weight:</b></td><td>${data.weight} kg</td></tr>
+          <tr><td><b>Delivery Zone:</b></td><td>${
+            withinSameDistrict ? "Within District" : "Outside District"
+          }</td></tr>
+          <tr><td><b>Base Cost:</b></td><td>৳${baseCost}</td></tr>
+          <tr><td><b>Extra Charge:</b></td><td>৳${extraCharge}</td></tr>
+          <tr><td><b>Total Cost:</b></td><td style="font-size:16px;color:#2ecc71"><b>৳${totalCost}</b></td></tr>
+        </table>
+      `,
       showCancelButton: true,
-      confirmButtonColor: "#4CAF50",
-      cancelButtonColor: "#f44336",
-      confirmButtonText: "Yes, confirm!",
-      cancelButtonText: "Cancel",
+      confirmButtonText: "Proceed to Payment",
+      cancelButtonText: "Edit Details",
+      focusConfirm: false,
     });
 
-    if (result.isConfirmed) {
+    if (isConfirmed) {
       console.log("SEND TO DB 👉", data);
-
-      Swal.fire({
-        title: "Success!",
-        text: "Parcel booked successfully ✅",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      toast.success("Parcel booked successfully ✅");
 
       form.reset();
       setSenderDistrict("");
@@ -121,7 +135,6 @@ const SendParcel = () => {
             <h2 className="font-medium text-gray-700 dark:text-gray-200 mb-4">
               Parcel Info
             </h2>
-
             <div className="flex gap-6 mb-4 text-sm">
               <label className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
                 <input
@@ -131,7 +144,6 @@ const SendParcel = () => {
                 />
                 Document
               </label>
-
               <label className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
                 <input
                   type="radio"
@@ -194,7 +206,6 @@ const SendParcel = () => {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
                     Address
@@ -206,7 +217,6 @@ const SendParcel = () => {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
                     Sender Phone No
@@ -218,7 +228,6 @@ const SendParcel = () => {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
                     District
@@ -240,7 +249,6 @@ const SendParcel = () => {
                     ))}
                   </select>
                 </div>
-
                 {senderDistrict && (
                   <div>
                     <label className="text-sm text-gray-600 dark:text-gray-300">
@@ -261,7 +269,6 @@ const SendParcel = () => {
                     </select>
                   </div>
                 )}
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
                     Pickup Instruction
@@ -293,7 +300,6 @@ const SendParcel = () => {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
                     Address
@@ -305,7 +311,6 @@ const SendParcel = () => {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
                     Receiver Phone No
@@ -317,7 +322,6 @@ const SendParcel = () => {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
                     District
@@ -339,7 +343,6 @@ const SendParcel = () => {
                     ))}
                   </select>
                 </div>
-
                 {receiverDistrict && (
                   <div>
                     <label className="text-sm text-gray-600 dark:text-gray-300">
@@ -360,7 +363,6 @@ const SendParcel = () => {
                     </select>
                   </div>
                 )}
-
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-300">
                     Delivery Instruction
