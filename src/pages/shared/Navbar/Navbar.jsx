@@ -24,6 +24,7 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Services", path: "/services" },
+    { name: "Send Parcel", path: "/sendParcel" },
     { name: "Coverage", path: "/coverage" },
     { name: "About", path: "/about" },
     { name: "Pricing", path: "/pricing" },

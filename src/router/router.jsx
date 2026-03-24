@@ -6,6 +6,8 @@ import Login from "../pages/Authentication/Login/Login";
 import Register from "../pages/Authentication/Register/Register";
 import ForgotPassword from "../pages/Authentication/ForgotPassword/ForgotPassword";
 import Coverage from "../pages/Coverage/Coverage";
+import PrivateRoute from "../Routes/PrivateRoute";
+import SendParcel from "../pages/SendParcel/SendParcel";
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +26,14 @@ export const router = createBrowserRouter([
           if (!res.ok) throw new Error("Failed to load warehouses");
           return res.json();
         },
+      },
+      {
+        path: "sendParcel",
+        element: (
+          <PrivateRoute>
+            <SendParcel />
+          </PrivateRoute>
+        ),
       },
     ],
   },
