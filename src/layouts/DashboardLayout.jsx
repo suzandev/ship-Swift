@@ -19,7 +19,9 @@ const DashboardLayout = () => {
       <aside className="w-64 bg-white dark:bg-gray-800 shadow-lg hidden md:flex flex-col justify-between">
         {/* Top */}
         <div>
-          <h2 className="text-2xl font-bold p-4 text-[#CAEB66]">ShipSwift</h2>
+          <h2 className="text-2xl p-4 font-bold text-[#1E1E1E] dark:text-white">
+            Ship<span className="text-[#CAEB66]">Swift</span>
+          </h2>
 
           {/* User Info */}
           <div className="px-4 mb-6">

@@ -1,10 +1,41 @@
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { useEffect, useState } from "react";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAuth from "../../../hooks/useAuth";
 
-const DashboardHome = ({ data }) => {
+const COLORS = ["#facc15", "#38bdf8", "#4ade80"];
+
+const DashboardHome = () => {
+  const axiosSecure = useAxiosSecure();
+  const { user } = useAuth();
+
+  const [stats, setStats] = useState({
+    pending: 0,
+    shipped: 0,
+    delivered: 0,
+  });
+
+  useEffect(() => {
+    if (!user?.email) return;
+
+    axiosSecure
+      .get(`/parcels/stats?email=${user.email}`)
+      .then((res) =>
+        setStats(
+          res.data || {
+            pending: 0,
+            shipped: 0,
+            delivered: 0,
+          },
+        ),
+      )
+      .catch((err) => console.log(err));
+  }, [user, axiosSecure]);
+
   const statusData = [
-    { name: "Pending", value: data.pending },
-    { name: "Shipped", value: data.shipped },
-    { name: "Delivered", value: data.delivered },
+    { name: "Pending", value: stats.pending },
+    { name: "Shipped", value: stats.shipped },
+    { name: "Delivered", value: stats.delivered },
   ];
 
   return (
@@ -12,8 +43,9 @@ const DashboardHome = ({ data }) => {
       {/* 👤 User Card */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
         <h2 className="text-lg font-semibold mb-4">User Info</h2>
-        <p>Name: John Doe</p>
-        <p>Email: john@email.com</p>
+
+        <p>Name: {user?.displayName}</p>
+        <p>Email: {user?.email}</p>
       </div>
 
       {/* 📊 Chart */}
@@ -23,7 +55,7 @@ const DashboardHome = ({ data }) => {
         <PieChart width={250} height={250}>
           <Pie data={statusData} dataKey="value">
             {statusData.map((_, i) => (
-              <Cell key={i} />
+              <Cell key={i} fill={COLORS[i]} />
             ))}
           </Pie>
           <Tooltip />
