@@ -4,10 +4,12 @@ import { toast } from "react-hot-toast";
 import { useLoaderData } from "react-router-dom";
 import Swal from "sweetalert2";
 import useAuth from "../../hooks/useAuth";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const SendParcel = () => {
   const warehouses = useLoaderData(); // Loader data
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const [parcelType, setParcelType] = useState("document");
 
   // Sender cascading
@@ -104,15 +106,24 @@ const SendParcel = () => {
     });
 
     if (isConfirmed) {
-      console.log("SEND TO DB 👉", data);
-      toast.success("Parcel booked successfully ✅");
+      try {
+        // 👉 SEND DATA TO SERVER
+        const res = await axiosSecure.post("/parcels", data);
 
-      form.reset();
-      setSenderDistrict("");
-      setSenderCoveredArea("");
-      setReceiverDistrict("");
-      setReceiverCoveredArea("");
-      setWeight(0);
+        if (res.data.insertedId) {
+          toast.success("Parcel booked successfully ✅");
+
+          form.reset();
+          setSenderDistrict("");
+          setSenderCoveredArea("");
+          setReceiverDistrict("");
+          setReceiverCoveredArea("");
+          setWeight(0);
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to book parcel ❌");
+      }
     }
   };
 
