@@ -28,6 +28,13 @@ const Navbar = () => {
     { name: "Coverage", path: "/coverage" },
     { name: "About", path: "/about" },
     { name: "Pricing", path: "/pricing" },
+
+    // 👇 Conditional link
+    ...(user?.role === "admin"
+      ? [{ name: "Admin Dashboard", path: "/dashboard/admin" }]
+      : user
+        ? [{ name: "Dashboard", path: "/dashboard" }]
+        : []),
   ];
 
   return (
