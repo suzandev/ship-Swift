@@ -24,12 +24,14 @@ const MyParcels = () => {
 
   return (
     <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
-      <h2 className="text-lg font-semibold mb-4">My Parcels</h2>
+      <h2 className="text-lg font-semibold mb-4 text-gray-600 dark:text-gray-300">
+        My Parcels
+      </h2>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left border-b">
+            <tr className="text-left border-b text-gray-600 dark:text-gray-300">
               <th>Title</th>
               <th>Receiver</th>
               <th>Status</th>
@@ -39,7 +41,9 @@ const MyParcels = () => {
 
           <tbody>
             {parcels.map((p) => (
-              <tr key={p._id} className="border-b">
+              <tr
+                key={p._id}
+                className="border-b text-gray-600 dark:text-gray-300">
                 <td>{p.title}</td>
                 <td>{p.receiverName}</td>
                 <td>{p.parcelStatus}</td>

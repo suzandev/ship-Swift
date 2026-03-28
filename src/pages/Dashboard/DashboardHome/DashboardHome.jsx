@@ -42,15 +42,21 @@ const DashboardHome = () => {
     <div className="grid md:grid-cols-2 gap-6">
       {/* 👤 User Card */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
-        <h2 className="text-lg font-semibold mb-4">User Info</h2>
+        <h2 className="text-lg font-semibold mb-4 text-[#1E1E1E] dark:text-white">
+          User Info
+        </h2>
 
-        <p>Name: {user?.displayName}</p>
-        <p>Email: {user?.email}</p>
+        <p className="text-gray-600 dark:text-gray-300">
+          Name: {user?.displayName}
+        </p>
+        <p className="text-gray-600 dark:text-gray-300">Email: {user?.email}</p>
       </div>
 
       {/* 📊 Chart */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
-        <h2 className="text-lg font-semibold mb-4">Parcel Status</h2>
+        <h2 className="text-lg font-semibold mb-4 text-[#1E1E1E] dark:text-white">
+          Parcel Status
+        </h2>
 
         <PieChart width={250} height={250}>
           <Pie data={statusData} dataKey="value">
@@ -66,3 +72,5 @@ const DashboardHome = () => {
 };
 
 export default DashboardHome;
+
+// 65.7 will be start
