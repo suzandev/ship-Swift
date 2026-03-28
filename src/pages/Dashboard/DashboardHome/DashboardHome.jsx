@@ -72,5 +72,3 @@ const DashboardHome = () => {
 };
 
 export default DashboardHome;
-
-// 65.7 will be start

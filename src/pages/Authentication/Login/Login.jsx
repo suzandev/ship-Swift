@@ -1,17 +1,26 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import useAuth from "../../../hooks/useAuth";
 
 const Login = () => {
-  const { googleSignIn } = useAuth();
+  const { googleSignIn, signIn } = useAuth();
+
+  const navigate = useNavigate();
+  const location = useLocation(); // ✅ added
+
+  // ✅ smart redirect (FIX)
+  const from = location.state?.from?.pathname || "/dashboard";
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,18 +30,43 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  // ✅ Email/Password Login (FIXED)
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login Data:", formData);
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      const result = await signIn(formData.email, formData.password);
+      console.log(result.user);
+
+      // 🔥 SMART REDIRECT FIX
+      navigate(from, { replace: true });
+    } catch (error) {
+      console.error(error);
+      setErrorMsg(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
-  const handleGoogleLogin = () => {
-    googleSignIn()
-      .then((result) => {
-        console.log(result.user);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+
+  // ✅ Google Login (FIXED)
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      const result = await googleSignIn();
+      console.log(result.user);
+
+      // 🔥 SMART REDIRECT FIX
+      navigate(from, { replace: true });
+    } catch (error) {
+      console.error(error);
+      setErrorMsg(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,6 +81,11 @@ const Login = () => {
       {/* Title */}
       <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
       <p className="text-gray-500 mt-1 mb-6">Login with ShipSwift</p>
+
+      {/* ❌ Error Message */}
+      {errorMsg && (
+        <p className="text-red-500 text-sm text-center mb-3">{errorMsg}</p>
+      )}
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,7 +108,7 @@ const Login = () => {
           <label className="text-sm text-gray-600">Password</label>
 
           <input
-            type={showPassword ? "text" : "password"} // 👈 toggle
+            type={showPassword ? "text" : "password"}
             name="password"
             value={formData.password}
             onChange={handleChange}
@@ -78,7 +117,6 @@ const Login = () => {
             required
           />
 
-          {/* 👁 Toggle Icon */}
           <span
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-[38px] cursor-pointer text-gray-500">
@@ -90,7 +128,6 @@ const Login = () => {
         <div className="text-right">
           <Link
             to="/forgotPassword"
-            type="button"
             className="text-sm text-gray-500 hover:text-green-500">
             Forgot Password?
           </Link>
@@ -99,8 +136,9 @@ const Login = () => {
         {/* Login Button */}
         <button
           type="submit"
+          disabled={loading}
           className="w-full bg-[#CAEB66] hover:bg-[#9db555] text-black py-2 rounded-lg transition">
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         {/* Register */}
@@ -122,9 +160,10 @@ const Login = () => {
         <button
           onClick={handleGoogleLogin}
           type="button"
+          disabled={loading}
           className="w-full flex items-center justify-center gap-2 border py-2 rounded-lg hover:bg-gray-100 transition">
           <FcGoogle size={20} />
-          Login with Google
+          {loading ? "Please wait..." : "Login with Google"}
         </button>
       </form>
     </div>

@@ -1,10 +1,11 @@
 import React from "react";
 import useAuth from "../hooks/useAuth";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import loadingGif from "../assets/running.gif";
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation(); // ✅ NEW
 
   // Show custom loader
   if (loading) {
@@ -15,12 +16,12 @@ const PrivateRoute = ({ children }) => {
     );
   }
 
-  // Redirect if not logged in
+  // Redirect if not logged in (WITH LOCATION STATE)
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // ✅ Show protected content
+  // Show protected content
   return children;
 };
 
