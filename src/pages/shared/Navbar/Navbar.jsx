@@ -170,14 +170,14 @@ const Navbar = () => {
               Logout
             </button>
           ) : (
-            <>
+            <div className="flex gap-4 items-center justify-evenly text-[#1E1E1E] dark:text-white">
               <Link to="/login" onClick={() => setIsOpen(false)}>
                 Sign In
               </Link>
               <Link to="/register" onClick={() => setIsOpen(false)}>
                 Sign Up
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>
