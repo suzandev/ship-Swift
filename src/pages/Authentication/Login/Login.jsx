@@ -8,9 +8,9 @@ const Login = () => {
   const { googleSignIn, signIn } = useAuth();
 
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ added
+  const location = useLocation();
 
-  // ✅ smart redirect (FIX)
+  // ✅ smart redirect
   const from = location.state?.from?.pathname || "/dashboard";
 
   const [formData, setFormData] = useState({
@@ -30,7 +30,7 @@ const Login = () => {
     }));
   };
 
-  // ✅ Email/Password Login (FIXED)
+  // ✅ Email/Password Login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -40,7 +40,7 @@ const Login = () => {
       const result = await signIn(formData.email, formData.password);
       console.log(result.user);
 
-      // 🔥 SMART REDIRECT FIX
+      // 🔥 SMART REDIRECT
       navigate(from, { replace: true });
     } catch (error) {
       console.error(error);
@@ -50,7 +50,7 @@ const Login = () => {
     }
   };
 
-  // ✅ Google Login (FIXED)
+  // ✅ Google Login
   const handleGoogleLogin = async () => {
     setLoading(true);
     setErrorMsg("");

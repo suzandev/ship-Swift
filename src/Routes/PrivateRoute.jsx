@@ -5,7 +5,7 @@ import loadingGif from "../assets/running.gif";
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  const location = useLocation(); // ✅ NEW
+  const location = useLocation();
 
   // Show custom loader
   if (loading) {

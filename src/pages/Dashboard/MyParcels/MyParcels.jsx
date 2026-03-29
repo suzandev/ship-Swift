@@ -3,9 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import useAuth from "../../../hooks/useAuth";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const MyParcels = () => {
   const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [selectedParcel, setSelectedParcel] = useState(null);
@@ -129,7 +131,9 @@ const MyParcels = () => {
                     </button>
 
                     {p.paymentStatus !== "paid" && (
-                      <button className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600">
+                      <button
+                        onClick={() => navigate(`/dashboard/payment/${p._id}`)}
+                        className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600">
                         Pay
                       </button>
                     )}
