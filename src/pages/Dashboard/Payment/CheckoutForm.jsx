@@ -51,6 +51,8 @@ const CheckoutForm = () => {
         parcelId: id,
       });
 
+      console.log("Payment intent response:", res.data);
+
       const clientSecret = res.data.clientSecret;
 
       if (!clientSecret) {
@@ -69,7 +71,7 @@ const CheckoutForm = () => {
       }
 
       if (result.paymentIntent?.status === "succeeded") {
-        // 🔥 FIX: send email (important for backend security)
+        // send email (important for backend security)
         await axiosSecure.patch(`/parcels/payment/${id}`, {
           email: parcel?.created_by,
           transactionId: result.paymentIntent.id,
@@ -78,7 +80,13 @@ const CheckoutForm = () => {
         toast.success("🎉 Payment Successful!", { id: toastId });
       }
     } catch (err) {
-      toast.error(err.message || "Something went wrong", { id: toastId });
+      console.log("🔥 Full Error:", err);
+      console.log("🔥 Backend Error:", err.response?.data);
+
+      toast.error(
+        err.response?.data?.error || err.message || "Something went wrong",
+        { id: toastId },
+      );
     }
 
     setLoading(false);
