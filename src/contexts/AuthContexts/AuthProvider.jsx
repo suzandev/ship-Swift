@@ -18,37 +18,38 @@ const AuthProvider = ({ children }) => {
 
   const createUser = (email, password) => {
     setLoading(true);
-    return createUserWithEmailAndPassword(auth, email, password).finally(() =>
-      setLoading(false),
-    );
+    return createUserWithEmailAndPassword(auth, email, password)
+      .then((result) => result)
+      .finally(() => setLoading(false));
   };
 
   const signIn = (email, password) => {
     setLoading(true);
-    return signInWithEmailAndPassword(auth, email, password).finally(() =>
-      setLoading(false),
-    );
+    return signInWithEmailAndPassword(auth, email, password)
+      .then((result) => result)
+      .finally(() => setLoading(false));
   };
 
-  // SignIn with Google
   const googleSignIn = () => {
     setLoading(true);
-    return signInWithPopup(auth, googleProvider).finally(() =>
-      setLoading(false),
-    );
+    return signInWithPopup(auth, googleProvider)
+      .then((result) => result)
+      .finally(() => setLoading(false));
   };
 
   const logOut = () => {
     setLoading(true);
-    return signOut(auth).finally(() => setLoading(false));
+    return signOut(auth)
+      .then(() => {})
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      console.log("user:", currentUser);
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 
