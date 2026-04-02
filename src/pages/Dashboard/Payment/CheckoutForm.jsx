@@ -22,7 +22,7 @@ const CheckoutForm = () => {
         const res = await axiosSecure.get(`/parcels/${id}`);
         setParcel(res.data);
       } catch (err) {
-        toast.error("Failed to load parcel ❌");
+        toast.error("Failed to load parcel ❌", err.message);
       }
     };
 
@@ -93,7 +93,7 @@ const CheckoutForm = () => {
   };
 
   // =========================
-  // PRICE SAFETY FIX
+  // PRICE SAFETY
   // =========================
   const price = parcel?.price ?? 0;
 
@@ -118,3 +118,5 @@ const CheckoutForm = () => {
 };
 
 export default CheckoutForm;
+
+// 66.8 will start

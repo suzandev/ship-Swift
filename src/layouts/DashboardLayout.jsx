@@ -9,9 +9,9 @@ const DashboardLayout = () => {
   // ✅ User Links
   const userLinks = [
     { name: "Dashboard", path: "/dashboard" },
-    { name: "Add Parcel", path: "/dashboard/addParcel" },
+    { name: "Profile", path: "/dashboard/profile" },
     { name: "My Parcels", path: "/dashboard/myParcels" },
-    { name: "Payments", path: "/dashboard/payments" },
+    { name: "Payment History", path: "/dashboard/PaymentHistory" },
     { name: "Tracking", path: "/dashboard/tracking" },
     { name: "Settings", path: "/dashboard/settings" },
   ];
