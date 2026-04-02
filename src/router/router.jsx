@@ -13,6 +13,7 @@ import MyParcels from "../pages/Dashboard/MyParcels/MyParcels";
 import DashboardHome from "../pages/Dashboard/DashboardHome/DashboardHome";
 import Payment from "../pages/Dashboard/Payment/Payment";
 import PaymentHistory from "../pages/PaymentHistory/PaymentHistory";
+import TrackParcel from "../pages/Dashboard/TrackParcel/TrackParcel";
 
 export const router = createBrowserRouter([
   {
@@ -88,6 +89,10 @@ export const router = createBrowserRouter([
       {
         path: "PaymentHistory",
         Component: PaymentHistory,
+      },
+      {
+        path: "Tracking",
+        Component: TrackParcel,
       },
     ],
   },
